@@ -1,0 +1,36 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: evenement-parcours-integration
+spec:
+  replicas: 1
+  template:
+    metadata:
+     labels:
+        app: evenement-parcours-integration
+    spec:
+      containers:
+      - name: evenement-parcours-integration
+        image: registry.k8.wildwidewest.xyz/repository/docker-repository/pocs/meltingpoc-evenement-parcours-integration:${IMAGE}
+        ports:
+        - containerPort: 8080
+        env:
+        - name: TOKEN_DROPBOX
+          valueFrom:
+            secretKeyRef:
+              name: dropboximages
+              key: token
+      imagePullSecrets:
+      - name: regsecret
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: evenement-parcours-integration
+spec:
+  selector:
+    app: evenement-parcours-integration
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
